@@ -94,21 +94,23 @@ export class Jogo {
     return this.fase === 'running';
   }
 
-  /** Credita um cenário recém-resolvido. Devolve os pontos, ou null se nada mudou. */
-  creditar(jogador: Jogador, cenarioId: number): { id: number; nome: string; pontos: number } | null {
+  /** Credita um cenário recém-resolvido. Devolve o detalhamento dos pontos, ou null se nada mudou. */
+  creditar(
+    jogador: Jogador,
+    cenarioId: number
+  ): { id: number; nome: string; pontos: number; base: number; bonusRapidez: number; bonusPrimeira: number } | null {
     if (!this.rodando() || jogador.solves.has(cenarioId)) return null;
     const c = CENARIO_POR_ID.get(cenarioId);
     if (!c) return null;
     const agora = Date.now();
-    let pontos = c.base + bonusRapidez(c.base, agora, this.inicio, this.fim);
-    if (!this.primeiraDe.has(cenarioId)) {
-      pontos += bonusPrimeira(c.base);
-      this.primeiraDe.add(cenarioId);
-    }
+    const rapidez = bonusRapidez(c.base, agora, this.inicio, this.fim);
+    const primeira = this.primeiraDe.has(cenarioId) ? 0 : bonusPrimeira(c.base);
+    if (primeira > 0) this.primeiraDe.add(cenarioId);
+    const pontos = c.base + rapidez + primeira;
     jogador.solves.set(cenarioId, { cenarioId, at: agora, pontos });
     jogador.pontos += pontos;
     this.transmitir();
-    return { id: cenarioId, nome: c.nome, pontos };
+    return { id: cenarioId, nome: c.nome, pontos, base: c.base, bonusRapidez: rapidez, bonusPrimeira: primeira };
   }
 
   /** Revela a dica de um cenário, descontando o custo. Devolve o texto. */

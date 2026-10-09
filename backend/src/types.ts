@@ -7,15 +7,21 @@ export type Kind = 'login' | 'busca' | 'stats' | 'relatorio';
 
 // Um cenário é um mini-app com várias páginas: umas para ler/explorar (texto, tabela)
 // e uma interativa (form), onde o ataque acontece. As páginas são conteúdo público.
+// `meta: true` marca páginas dirigidas ao jogador (fora da ficção do cenário, tipo um
+// aviso de regras do jogo), em vez de conteúdo do mini-app fictício. Elas vêm primeiro
+// na lista de abas e ganham uma cor diferente no frontend.
 export type Pagina =
-  | { tipo: 'texto'; id: string; nome: string; titulo: string; corpo: string[] }
-  | { tipo: 'tabela'; id: string; nome: string; titulo: string; colunas: string[]; linhas: string[][]; nota?: string }
-  | { tipo: 'lista'; id: string; nome: string; titulo: string; itens: { de?: string; txt: string }[]; nota?: string }
-  | { tipo: 'ficha'; id: string; nome: string; titulo: string; campos: { rotulo: string; valor: string }[]; nota?: string }
-  | { tipo: 'codigo'; id: string; nome: string; titulo: string; linguagem?: string; codigo: string[]; nota?: string }
-  | { tipo: 'faq'; id: string; nome: string; titulo: string; qa: { q: string; a: string }[]; nota?: string }
-  | { tipo: 'tiles'; id: string; nome: string; titulo: string; cards: { rotulo: string; valor: string; sub?: string }[]; nota?: string }
-  | { tipo: 'form'; id: string; nome: string; titulo: string; instrucao: string };
+  | { tipo: 'texto'; id: string; nome: string; titulo: string; corpo: string[]; meta?: boolean }
+  | { tipo: 'tabela'; id: string; nome: string; titulo: string; colunas: string[]; linhas: string[][]; nota?: string; meta?: boolean }
+  | { tipo: 'lista'; id: string; nome: string; titulo: string; itens: { de?: string; txt: string }[]; nota?: string; meta?: boolean }
+  | { tipo: 'ficha'; id: string; nome: string; titulo: string; campos: { rotulo: string; valor: string }[]; nota?: string; meta?: boolean }
+  | { tipo: 'codigo'; id: string; nome: string; titulo: string; linguagem?: string; codigo: string[]; nota?: string; meta?: boolean }
+  | { tipo: 'faq'; id: string; nome: string; titulo: string; qa: { q: string; a: string }[]; nota?: string; meta?: boolean }
+  | { tipo: 'tiles'; id: string; nome: string; titulo: string; cards: { rotulo: string; valor: string; sub?: string }[]; nota?: string; meta?: boolean }
+  | { tipo: 'form'; id: string; nome: string; titulo: string; instrucao: string; meta?: boolean }
+  // ferramenta: digita um texto, recebe o hash MD5 dele. Sem internet, é o jeito de
+  // testar candidatos de senha contra um hash vazado (força bruta manual).
+  | { tipo: 'hash'; id: string; nome: string; titulo: string; instrucao: string; meta?: boolean };
 
 export interface ResultadoSQL {
   sql: string;

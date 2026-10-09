@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SocketService } from '../socket.service';
-import type { CenarioPublico, Pagina, RespostaAcao } from '../modelos';
+import type { CenarioPublico, Pagina, RespostaAcao, Resolvido } from '../modelos';
 
 @Component({
   selector: 'app-jogo',
@@ -29,13 +29,15 @@ export class Jogo {
   statsAgg = signal('COUNT(*)');
   statsOnde = signal('');
   relOrdem = signal('');
+  hashEntrada = signal('');
+  hashResultado = signal('');
 
   resultado = signal<RespostaAcao | null>(null);
   carregando = signal(false);
   resposta = signal('');
   respostaMsg = signal<'' | 'certo' | 'errado'>('');
   dicas = signal<Record<number, string>>({});
-  pontosGanhos = signal<Record<number, number>>({});
+  detalhesGanhos = signal<Record<number, Resolvido>>({});
   toasts = signal<{ texto: string; pontos: number }[]>([]);
   private vistos = 0;
 
@@ -44,7 +46,7 @@ export class Jogo {
       const feed = this.sock.feed();
       for (; this.vistos < feed.length; this.vistos++) {
         const r = feed[this.vistos];
-        this.pontosGanhos.update((p) => ({ ...p, [r.id]: r.pontos }));
+        this.detalhesGanhos.update((p) => ({ ...p, [r.id]: r }));
         const t = { texto: r.nome, pontos: r.pontos };
         this.toasts.update((a) => [...a, t]);
         setTimeout(() => this.toasts.update((a) => a.filter((x) => x !== t)), 4000);
@@ -73,16 +75,27 @@ export class Jogo {
     return this.resolvidos().has(c.id);
   }
   pontosDe(id: number): number | null {
-    return this.pontosGanhos()[id] ?? null;
+    return this.detalhesGanhos()[id]?.base ?? null;
+  }
+  bonusRapidezDe(id: number): number {
+    return this.detalhesGanhos()[id]?.bonusRapidez ?? 0;
+  }
+  bonusPrimeiraDe(id: number): number {
+    return this.detalhesGanhos()[id]?.bonusPrimeira ?? 0;
   }
   custoDica(base: number): number {
     return Math.round(base * 0.3);
   }
 
+  // Páginas 'meta' (avisos ao jogador, fora da ficção do cenário) vêm primeiro na lista.
+  paginasDe(c: CenarioPublico): Pagina[] {
+    return [...c.paginas].sort((a, b) => Number(!!b.meta) - Number(!!a.meta));
+  }
+
   abrir(c: CenarioPublico): void {
     if (!this.rodando()) return; // cenários bloqueados fora da partida
     this.aberto.set(c);
-    this.pagina.set(c.paginas[0] ?? null);
+    this.pagina.set(this.paginasDe(c)[0] ?? null);
     this.resultado.set(null);
     this.resposta.set('');
     this.respostaMsg.set('');
@@ -92,6 +105,8 @@ export class Jogo {
     this.statsAgg.set('COUNT(*)');
     this.statsOnde.set('');
     this.relOrdem.set('');
+    this.hashEntrada.set('');
+    this.hashResultado.set('');
   }
   voltar(): void {
     this.aberto.set(null);
@@ -144,5 +159,10 @@ export class Jogo {
     if (!c) return;
     await this.sock.resetarAmbiente(c.id);
     this.resultado.set(null);
+  }
+
+  async calcularHash(): Promise<void> {
+    const r = await this.sock.hash(this.hashEntrada());
+    this.hashResultado.set(r.md5);
   }
 }

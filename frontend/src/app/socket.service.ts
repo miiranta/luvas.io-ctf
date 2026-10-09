@@ -109,4 +109,7 @@ export class SocketService {
   resetarAmbiente(cenarioId: number): Promise<{ ok: boolean }> {
     return this.socket.emitWithAck('resetar-ambiente', { cenarioId });
   }
+  hash(texto: string): Promise<{ md5: string }> {
+    return this.socket.emitWithAck('hash', { texto });
+  }
 }

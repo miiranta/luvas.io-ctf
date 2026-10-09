@@ -50,10 +50,13 @@
 .objetivo i { color: #c9971a; margin-right: 4px; }
 .objetivo strong { font-weight: 800; }
 .ok-banner { background: var(--verde-claro); color: var(--verde-escuro); font-weight: 700; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+.ok-banner .bonus-extra { display: block; font-weight: 500; font-size: 0.85em; margin-top: 4px; }
 /* navegação entre páginas do cenário */
 .paginas { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
 .pg { flex: 0 0 auto; background: #fff; color: var(--carvao); border: 1px solid var(--linha); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 14px; min-height: 40px; }
 .pg.on { background: var(--carvao); color: #fff; border-color: var(--carvao); }
+.pg.meta { background: var(--creme); border-color: #e8d49a; }
+.pg.meta.on { background: #c9a227; color: #fff; border-color: #c9a227; }
 
 /* páginas de leitura */
 .leitura h3 { font-size: 17px; margin-bottom: 10px; }

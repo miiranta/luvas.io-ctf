@@ -9,7 +9,7 @@ const temAlguma = (res: ResultadoSQL, alvos: string[]) => {
 };
 const AGREGADOS = ['count', 'avg', 'sum', 'min', 'max'];
 
-// Cada cenário é um mini-app de uma empresa fictícia (Nimbus Corp), com várias telas: a
+// Cada cenário é um mini-app de uma empresa fictícia (AmongUs Corp), com várias telas: a
 // interativa, mais páginas de contexto (fonte do código, fichas, FAQ, métricas, um chat
 // interno). O conteúdo dá pistas e clima; o passo exato do ataque continua com o jogador
 // (guiado pelos slides e pela dica paga). Nome e resumo são vagos de propósito; nada aqui
@@ -19,7 +19,7 @@ export const CENARIOS: Cenario[] = [
     id: 1,
     nome: 'Sésamo',
     resumo: 'Entre no painel sem ser convidado.',
-    premissa: 'Portal de acesso da Nimbus Corp.',
+    premissa: 'Portal de acesso da AmongUs Corp.',
     objetivo: 'Entre como admin, sem saber a senha do admin.',
     dica: "A consulta vira ...WHERE login='x' AND senha='x'. E se a condição ficar sempre verdadeira? Pense em OR '1'='1 e no comentário --",
     dificuldade: 'facil',
@@ -28,14 +28,21 @@ export const CENARIOS: Cenario[] = [
     kind: 'login',
     revelaSQL: true,
     paginas: [
-      { tipo: 'form', id: 'entrar', nome: 'Entrar', titulo: 'Portal Nimbus Corp', instrucao: 'Acesso restrito a funcionários. Entre com usuário e senha.' },
+      {
+        tipo: 'texto', id: 'avisos', nome: 'Avisos', titulo: 'Bem-vindos, tripulantes', meta: true,
+        corpo: [
+          'Este é o cenário de aquecimento: na tela Entrar você vê a consulta final que o sistema monta. Os outros cenários não entregam a consulta de bandeja.',
+          'Dica de casa: leia a aba Fonte e repare onde a sua entrada cai na consulta.',
+        ],
+      },
+      { tipo: 'form', id: 'entrar', nome: 'Entrar', titulo: 'Portal AmongUs Corp', instrucao: 'Acesso restrito a tripulantes. Entre com usuário e senha.' },
       {
         tipo: 'tiles', id: 'status', nome: 'Status', titulo: 'Status do sistema',
         cards: [
           { rotulo: 'Uptime', valor: '99.?%', sub: 'alguém reiniciou o servidor de novo' },
           { rotulo: 'Tickets abertos', valor: '142', sub: 'ninguém sabe por quê' },
           { rotulo: 'Deploys hoje', valor: '3', sub: 'nenhum testado' },
-          { rotulo: 'Online agora', valor: '14', sub: 'funcionários' },
+          { rotulo: 'Online agora', valor: '14', sub: 'tripulantes' },
         ],
       },
       {
@@ -49,13 +56,6 @@ export const CENARIOS: Cenario[] = [
           '      "AND senha=\'" + senha + "\'"',
         ],
         nota: 'Sim, concatenado na mão. O que a sua entrada vira dentro das aspas, o banco executa.',
-      },
-      {
-        tipo: 'texto', id: 'avisos', nome: 'Avisos', titulo: 'Bem-vindo',
-        corpo: [
-          'Este é o cenário de aquecimento: na tela Entrar, de graça, você vê a consulta final que o sistema monta. Os outros cenários não entregam a consulta de bandeja.',
-          'Dica de casa: leia a aba Fonte e repare onde a sua entrada cai na consulta.',
-        ],
       },
       {
         tipo: 'lista', id: 'chat', nome: 'Chat', titulo: '#geral',
@@ -86,7 +86,7 @@ export const CENARIOS: Cenario[] = [
     id: 2,
     nome: 'O departamento vizinho',
     resumo: 'A busca só mostra o seu time. Será?',
-    premissa: 'O diretório de funcionários insiste em te mostrar só o seu setor.',
+    premissa: 'O diretório de tripulantes insiste em te mostrar só o seu setor.',
     objetivo: 'Faça a busca devolver alguém de outro departamento.',
     dica: 'A busca filtra ...AND depto=5. Com OR 1=1 e comentando o resto da linha com -- você derruba o filtro e traz todo mundo.',
     dificuldade: 'medio',
@@ -94,7 +94,7 @@ export const CENARIOS: Cenario[] = [
     tipo: 'auto',
     kind: 'busca',
     paginas: [
-      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de funcionários', instrucao: 'Procure um funcionário pelo nome.' },
+      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de tripulantes', instrucao: 'Procure um tripulante pelo nome.' },
       {
         tipo: 'ficha', id: 'cracha', nome: 'Meu crachá', titulo: 'Seu crachá',
         campos: [
@@ -107,7 +107,7 @@ export const CENARIOS: Cenario[] = [
       {
         tipo: 'tabela', id: 'organograma', nome: 'Organograma', titulo: 'Setores da empresa',
         colunas: ['Depto', 'Área'],
-        linhas: [['5', 'Engenharia (o seu)'], ['7', 'Financeiro (sempre atrasado com reembolso)'], ['9', 'Diretoria (ninguém do resto da empresa já subiu lá)']],
+        linhas: [['5', 'Engenharia (o seu)'], ['7', 'Financeiro (faria limers)'], ['9', 'Diretoria (ninguém do resto da empresa já subiu lá)']],
         nota: 'A busca só lista o seu setor. Os outros existem, mas não aparecem por aqui.',
       },
       {
@@ -136,7 +136,7 @@ export const CENARIOS: Cenario[] = [
     id: 3,
     nome: 'O cofre',
     resumo: 'Há coisas guardadas que a tela nunca mostra.',
-    premissa: 'Diretório de funcionários. Mas nem tudo que a empresa guarda fica à vista.',
+    premissa: 'Diretório de tripulantes. Mas nem tudo que a empresa guarda fica à vista.',
     objetivo: 'Leia o conteúdo da tabela segredos.',
     dica: 'A busca devolve 2 colunas. Com UNION SELECT você escolhe de qual tabela elas vêm, inclusive da tabela segredos.',
     dificuldade: 'medio',
@@ -144,7 +144,7 @@ export const CENARIOS: Cenario[] = [
     tipo: 'auto',
     kind: 'busca',
     paginas: [
-      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de funcionários', instrucao: 'Procure um funcionário pelo nome.' },
+      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de tripulantes', instrucao: 'Procure um tripulante pelo nome.' },
       {
         tipo: 'texto', id: 'mural', nome: 'Mural', titulo: 'Mural interno',
         corpo: [
@@ -188,19 +188,19 @@ export const CENARIOS: Cenario[] = [
     id: 4,
     nome: 'Fora da vista',
     resumo: 'A tela escolheu o que te mostrar.',
-    premissa: 'Diretório de funcionários que mostra pouco de cada um.',
-    objetivo: 'Descubra o salário de um funcionário.',
+    premissa: 'Diretório de tripulantes que mostra pouco de cada um.',
+    objetivo: 'Descubra o salário de um tripulante.',
     dica: 'A tela só mostra nome e depto. Com UNION SELECT dá para colocar o salário no lugar de uma dessas colunas.',
     dificuldade: 'medio',
     base: 200,
     tipo: 'auto',
     kind: 'busca',
     paginas: [
-      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de funcionários', instrucao: 'Procure um funcionário. A tela mostra nome e departamento.' },
+      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de tripulantes', instrucao: 'Procure um tripulante. A tela mostra nome e departamento.' },
       {
         tipo: 'texto', id: 'politica', nome: 'Política', titulo: 'Dados confidenciais',
         corpo: [
-          'O salário de cada funcionário é confidencial, por isso não aparece na busca.',
+          'O salário de cada tripulante é confidencial, por isso não aparece na busca.',
           'A tela foi feita para exibir apenas nome e departamento. O dado continua lá na tabela, só não é selecionado.',
         ],
       },
@@ -361,8 +361,12 @@ export const CENARIOS: Cenario[] = [
           { de: 'ti_legado', txt: 'o estagiario usava a senha mais óbvia que existe, a que todo tutorial manda não usar' },
           { de: 'estagiario', txt: 'minha senha era segura, tinha até número' },
           { de: 'ti_legado', txt: 'isso não é senha, é um convite' },
-          { de: 'dev', txt: 'vaza o senha_hash dele com um UNION e procura o hash num site qualquer' },
+          { de: 'dev', txt: 'vaza o senha_hash dele com um UNION e bate contra a aba Hash aqui mesmo, sem precisar de internet' },
         ],
+      },
+      {
+        tipo: 'hash', id: 'ferramenta', nome: 'Hash', titulo: 'Calculadora de hash',
+        instrucao: 'Digite um texto e veja o hash MD5 dele. Útil para testar candidatos de senha contra um hash vazado.',
       },
     ],
     montarSQL: (e) => `SELECT nome, depto FROM funcionario WHERE nome='${e['nome'] ?? ''}'`,
@@ -372,7 +376,7 @@ export const CENARIOS: Cenario[] = [
     id: 7,
     nome: 'Confidencial',
     resumo: 'Uma linha foi marcada como secreta.',
-    premissa: 'Diretório de funcionários com registros classificados.',
+    premissa: 'Diretório de tripulantes com registros classificados.',
     objetivo: 'Leia o desempenho da linha marcada como secreta.',
     dica: 'A tela esconde a linha de classe S. Com UNION SELECT nome, desempenho FROM funcionario você vê o que ela não mostra.',
     dificuldade: 'dificil',
@@ -380,7 +384,7 @@ export const CENARIOS: Cenario[] = [
     tipo: 'auto',
     kind: 'busca',
     paginas: [
-      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de funcionários', instrucao: 'Procure um funcionário pelo nome.' },
+      { tipo: 'form', id: 'buscar', nome: 'Buscar', titulo: 'Diretório de tripulantes', instrucao: 'Procure um tripulante pelo nome.' },
       {
         tipo: 'texto', id: 'classificacao', nome: 'Classificação', titulo: 'Níveis de classificação',
         corpo: [

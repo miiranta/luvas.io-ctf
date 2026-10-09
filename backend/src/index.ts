@@ -8,6 +8,7 @@ import { Server } from 'socket.io';
 import { Jogo } from './game.js';
 import { executar } from './engine.js';
 import { CENARIO_POR_ID, CENARIOS_PUBLICOS } from './scenarios.js';
+import { md5 } from './seed.js';
 import type { RespostaAcao, ResultadoSQL } from './types.js';
 
 const PORT = Number(process.env.PORT) || 3000;
@@ -86,6 +87,14 @@ io.on('connection', (socket) => {
     const j = jogadorDe(socket.id);
     if (!j) return cb?.({ dica: null });
     cb?.({ dica: jogo.revelarDica(j, Number(d?.cenarioId)) });
+  });
+
+  // Ferramenta de hash MD5 (offline, sem internet): usada para testar candidatos de
+  // senha contra um hash vazado. Não depende de cenário nem de partida em andamento.
+  socket.on('hash', (d: { texto?: string }, cb?: (r: { md5: string }) => void) => {
+    const j = jogadorDe(socket.id);
+    if (!j) return cb?.({ md5: '' });
+    cb?.({ md5: md5(String(d?.texto ?? '').slice(0, 200)) });
   });
 
   socket.on('resetar-ambiente', (d: { cenarioId?: number }, cb?: (r: { ok: boolean }) => void) => {

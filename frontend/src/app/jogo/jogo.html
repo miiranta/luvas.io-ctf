@@ -28,13 +28,21 @@
     <p class="premissa">{{ c.premissa }}</p>
     <p class="objetivo"><i class="fa-solid fa-bullseye"></i> <strong>Objetivo:</strong> {{ c.objetivo }}</p>
     @if (resolvido(c)) {
-      <div class="ok-banner"><i class="fa-solid fa-circle-check"></i> Cenário resolvido @if (pontosDe(c.id) !== null) { (+{{ pontosDe(c.id) }} pts) }</div>
+      <div class="ok-banner">
+        <i class="fa-solid fa-circle-check"></i> Cenário resolvido @if (pontosDe(c.id) !== null) { (+{{ pontosDe(c.id) }} pts) }
+        @if (bonusRapidezDe(c.id) > 0) {
+          <span class="bonus-extra"><i class="fa-solid fa-bolt"></i> +{{ bonusRapidezDe(c.id) }} pts de velocidade</span>
+        }
+        @if (bonusPrimeiraDe(c.id) > 0) {
+          <span class="bonus-extra"><i class="fa-solid fa-medal"></i> +{{ bonusPrimeiraDe(c.id) }} pts por ser o primeiro</span>
+        }
+      </div>
     }
 
     <!-- navegação entre as páginas do mini-app -->
     <nav class="paginas">
-      @for (p of c.paginas; track p.id) {
-        <button class="pg" [class.on]="pagina()?.id === p.id" (click)="irPara(p)">{{ p.nome }}</button>
+      @for (p of paginasDe(c); track p.id) {
+        <button class="pg" [class.on]="pagina()?.id === p.id" [class.meta]="p.meta" (click)="irPara(p)">{{ p.nome }}</button>
       }
     </nav>
 
@@ -118,6 +126,21 @@
               }
             </div>
             @if (p.nota) { <p class="nota">{{ p.nota }}</p> }
+          </div>
+        }
+        @case ('hash') {
+          <div class="card amb">
+            <h3>{{ p.titulo }}</h3>
+            <p class="instrucao">{{ p.instrucao }}</p>
+            <label>Texto</label>
+            <input class="cod" [(ngModel)]="hashEntrada" (keyup.enter)="calcularHash()" placeholder="candidato de senha"
+                   autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+            <button class="block" (click)="calcularHash()">Hashear (MD5)</button>
+            @if (hashResultado()) {
+              <div class="saida">
+                <div class="sql"><span class="rot">MD5</span><code>{{ hashResultado() }}</code></div>
+              </div>
+            }
           </div>
         }
         @case ('form') {

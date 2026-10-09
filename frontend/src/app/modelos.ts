@@ -6,7 +6,7 @@ export type Kind = 'login' | 'busca' | 'stats' | 'relatorio';
 
 // Campos opcionais (em vez de união discriminada) para o template acessar livremente.
 export interface Pagina {
-  tipo: 'texto' | 'tabela' | 'lista' | 'ficha' | 'codigo' | 'faq' | 'tiles' | 'form';
+  tipo: 'texto' | 'tabela' | 'lista' | 'ficha' | 'codigo' | 'faq' | 'tiles' | 'form' | 'hash';
   id: string;
   nome: string;
   titulo: string;
@@ -21,6 +21,7 @@ export interface Pagina {
   cards?: { rotulo: string; valor: string; sub?: string }[];
   nota?: string;
   instrucao?: string;
+  meta?: boolean;
 }
 
 export interface CenarioPublico {
@@ -60,6 +61,9 @@ export interface Resolvido {
   id: number;
   nome: string;
   pontos: number;
+  base: number;
+  bonusRapidez: number;
+  bonusPrimeira: number;
 }
 
 export interface ResultadoSQL {
