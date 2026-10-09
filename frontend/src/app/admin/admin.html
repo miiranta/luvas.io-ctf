@@ -1,0 +1,67 @@
+@if (!autenticado()) {
+  <div class="porta">
+    <div class="card box">
+      <h1>Painel do apresentador</h1>
+      <p class="sub">Informe a chave de acesso.</p>
+      <input [(ngModel)]="chave" (keyup.enter)="entrar()" type="password" placeholder="chave de acesso"
+             autocomplete="off" autocapitalize="none" />
+      @if (erro()) { <div class="err">Chave incorreta.</div> }
+      <button class="block" (click)="entrar()" [disabled]="!chave().trim()">Entrar</button>
+    </div>
+  </div>
+} @else {
+  <div class="painel">
+    <header class="barra">
+      <h1>Controle do jogo</h1>
+      <div class="rel" [class.run]="fase()==='running'">
+        <span class="fase">{{ fase() === 'running' ? 'EM ANDAMENTO' : fase() === 'ended' ? 'ENCERRADO' : 'LOBBY' }}</span>
+        <span class="t">{{ mmss() }}</span>
+      </div>
+    </header>
+
+    <div class="card controles">
+      <label>Duração
+        <span class="dur"><input type="number" min="1" max="240" [(ngModel)]="duracaoMin" /> min</span>
+      </label>
+      <button (click)="iniciar()"><i class="fa-solid fa-play"></i> Iniciar</button>
+      <button class="sec" (click)="encerrar()" [disabled]="fase()!=='running'"><i class="fa-solid fa-stop"></i> Encerrar</button>
+      <button class="perigo" (click)="resetar()">Resetar</button>
+      <span class="jog">{{ placar().length }} jogadores</span>
+    </div>
+
+    <div class="card grid-wrap">
+      <h2><i class="fa-solid fa-ranking-star"></i> Placar</h2>
+      <p class="nota-grid">Cada célula mostra o minuto em que o cenário foi resolvido.</p>
+      <div class="scroll">
+        <table class="icpc">
+          <thead>
+            <tr>
+              <th class="c-pos">#</th>
+              <th class="c-nome">Jogador</th>
+              @for (c of cenarios(); track c.id) { <th class="c-c" [title]="c.nome">{{ c.id }}</th> }
+              <th class="c-pts">Pontos</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (l of placar(); track l.id) {
+              <tr>
+                <td class="c-pos">{{ $index + 1 }}</td>
+                <td class="c-nome">{{ l.nome }}</td>
+                @for (c of cenarios(); track c.id) {
+                  @let min = minutoDe(l, c.id);
+                  <td class="c-c" [class.ok]="min !== null">@if (min !== null) { {{ min }} }</td>
+                }
+                <td class="c-pts">{{ l.pontos }}</td>
+              </tr>
+            } @empty {
+              <tr><td class="vazio" [attr.colspan]="cenarios().length + 3">Nenhum jogador conectado.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="legenda">
+        @for (c of cenarios(); track c.id) { <span><b>{{ c.id }}</b> {{ c.nome }}</span> }
+      </div>
+    </div>
+  </div>
+}

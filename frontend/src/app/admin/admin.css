@@ -1,0 +1,41 @@
+:host { display: block; }
+
+.porta { min-height: 100dvh; display: grid; place-items: center; padding: 20px; }
+.box { width: 100%; max-width: 400px; text-align: center; padding: 28px 22px; }
+.box h1 { font-size: 22px; margin-bottom: 4px; }
+.box .sub { color: var(--cinza); margin: 0 0 18px; }
+.box input { margin-bottom: 12px; text-align: center; }
+.err { color: var(--vermelho); font-size: 14px; margin-bottom: 10px; }
+
+.painel { max-width: 1200px; margin: 0 auto; padding: 16px; }
+.barra { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.barra h1 { font-size: 20px; }
+.rel { display: flex; gap: 12px; align-items: center; background: var(--carvao); color: #fff; padding: 8px 14px; border-radius: 10px; }
+.rel.run .fase { color: var(--verde); }
+.rel .fase { font-weight: 800; font-size: 12px; letter-spacing: 0.03em; }
+.rel .t { font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.controles { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.controles label { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.controles select { width: auto; }
+.dur { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.dur input { width: 74px; text-align: center; }
+.controles .jog { margin-left: auto; color: var(--cinza); font-weight: 600; }
+
+.grid-wrap h2 { font-size: 17px; margin-bottom: 6px; }
+.grid-wrap h2 i { color: #e8b100; margin-right: 6px; }
+.controles button i { margin-right: 5px; }
+.nota-grid { color: var(--cinza); font-size: 13px; margin: 0 0 12px; }
+.scroll { overflow-x: auto; }
+.icpc { width: 100%; border-collapse: collapse; font-size: 15px; }
+.icpc th, .icpc td { padding: 9px 7px; text-align: center; border-bottom: 1px solid var(--linha); white-space: nowrap; }
+.icpc .c-nome { text-align: left; font-weight: 700; position: sticky; left: 0; background: #fff; }
+.icpc .c-pos { color: var(--cinza); font-weight: 800; width: 34px; }
+.icpc .c-c { width: 42px; color: var(--cinza); font-variant-numeric: tabular-nums; }
+.icpc .c-c.ok { background: var(--verde-claro); color: var(--verde-escuro); font-weight: 800; }
+.icpc .c-pts { font-weight: 800; color: var(--verde-escuro); }
+.icpc thead th { color: var(--cinza); font-size: 12px; text-transform: uppercase; border-bottom: 2px solid var(--linha); }
+.vazio { color: var(--cinza); padding: 22px; }
+
+.legenda { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--cinza); }
+.legenda b { color: var(--carvao); }

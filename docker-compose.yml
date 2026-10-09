@@ -1,0 +1,10 @@
+services:
+  jogo:
+    build: .
+    image: jogo-seguranca
+    ports:
+      - '7125:7125'
+    environment:
+      - PORT=7125
+      - ADMIN_KEY=lucas123miranda
+    restart: unless-stopped

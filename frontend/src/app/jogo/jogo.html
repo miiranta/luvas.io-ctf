@@ -1,0 +1,288 @@
+<header class="topo">
+  <div class="eu">
+    <span class="marca">MC536</span>
+    <strong>{{ nome() }}</strong>
+  </div>
+  <div class="dir">
+    <span class="timer" [class.acabando]="restante() <= 60 && rodando()">
+      <i class="fa-solid fa-clock"></i>
+      @if (rodando()) { {{ mmss() }} } @else if (terminou()) { fim } @else { aguarde }
+    </span>
+    <span class="pts"><i class="fa-solid fa-star"></i> {{ meusPontos() }}</span>
+  </div>
+</header>
+
+@if (!rodando() && !terminou()) {
+  <div class="aviso"><i class="fa-solid fa-lock"></i> O apresentador ainda não iniciou. Os cenários e as dicas abrem quando a partida começar.</div>
+}
+
+<!-- ===================== DETALHE DE UM CENÁRIO ===================== -->
+@if (aberto(); as c) {
+  <main class="conteudo detalhe">
+    <button class="voltar sec" (click)="voltar()">Voltar aos cenários</button>
+
+    <div class="cab">
+      <h2>{{ c.nome }}</h2>
+      <span class="tag" [class]="c.dificuldade">{{ c.dificuldade }}</span>
+    </div>
+    <p class="premissa">{{ c.premissa }}</p>
+    <p class="objetivo"><i class="fa-solid fa-bullseye"></i> <strong>Objetivo:</strong> {{ c.objetivo }}</p>
+    @if (resolvido(c)) {
+      <div class="ok-banner"><i class="fa-solid fa-circle-check"></i> Cenário resolvido @if (pontosDe(c.id) !== null) { (+{{ pontosDe(c.id) }} pts) }</div>
+    }
+
+    <!-- navegação entre as páginas do mini-app -->
+    <nav class="paginas">
+      @for (p of c.paginas; track p.id) {
+        <button class="pg" [class.on]="pagina()?.id === p.id" (click)="irPara(p)">{{ p.nome }}</button>
+      }
+    </nav>
+
+    @if (pagina(); as p) {
+      @switch (p.tipo) {
+        @case ('texto') {
+          <div class="card leitura">
+            <h3>{{ p.titulo }}</h3>
+            @for (par of p.corpo; track $index) { <p>{{ par }}</p> }
+          </div>
+        }
+        @case ('tabela') {
+          <div class="card leitura">
+            <h3>{{ p.titulo }}</h3>
+            <div class="tabela">
+              <table>
+                <thead><tr>@for (col of p.colunas; track col) { <th>{{ col }}</th> }</tr></thead>
+                <tbody>
+                  @for (lin of p.linhas; track $index) {
+                    <tr>@for (cel of lin; track $index) { <td>{{ cel }}</td> }</tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            @if (p.nota) { <p class="nota">{{ p.nota }}</p> }
+          </div>
+        }
+        @case ('lista') {
+          <div class="card leitura">
+            <h3>{{ p.titulo }}</h3>
+            <div class="chat">
+              @for (m of p.itens; track $index) {
+                <div class="msg">
+                  @if (m.de) { <span class="de">{{ m.de }}</span> }
+                  <span class="txt">{{ m.txt }}</span>
+                </div>
+              }
+            </div>
+            @if (p.nota) { <p class="nota">{{ p.nota }}</p> }
+          </div>
+        }
+        @case ('ficha') {
+          <div class="card leitura">
+            <h3>{{ p.titulo }}</h3>
+            <dl class="ficha">
+              @for (campo of p.campos; track $index) {
+                <div class="frow"><dt>{{ campo.rotulo }}</dt><dd>{{ campo.valor }}</dd></div>
+              }
+            </dl>
+            @if (p.nota) { <p class="nota">{{ p.nota }}</p> }
+          </div>
+        }
+        @case ('codigo') {
+          <div class="card leitura">
+            <h3>{{ p.titulo }}</h3>
+            <pre class="bloco-codigo"><code>{{ codigoTexto(p.codigo) }}</code></pre>
+            @if (p.nota) { <p class="nota">{{ p.nota }}</p> }
+          </div>
+        }
+        @case ('faq') {
+          <div class="card leitura">
+            <h3>{{ p.titulo }}</h3>
+            <div class="faq">
+              @for (item of p.qa; track $index) {
+                <div class="qa"><div class="q">{{ item.q }}</div><div class="a">{{ item.a }}</div></div>
+              }
+            </div>
+            @if (p.nota) { <p class="nota">{{ p.nota }}</p> }
+          </div>
+        }
+        @case ('tiles') {
+          <div class="card leitura">
+            <h3>{{ p.titulo }}</h3>
+            <div class="tiles">
+              @for (card of p.cards; track $index) {
+                <div class="tile">
+                  <div class="t-val">{{ card.valor }}</div>
+                  <div class="t-rot">{{ card.rotulo }}</div>
+                  @if (card.sub) { <div class="t-sub">{{ card.sub }}</div> }
+                </div>
+              }
+            </div>
+            @if (p.nota) { <p class="nota">{{ p.nota }}</p> }
+          </div>
+        }
+        @case ('form') {
+          <div class="card amb">
+            <h3>{{ p.titulo }}</h3>
+            <p class="instrucao">{{ p.instrucao }}</p>
+            @switch (c.kind) {
+              @case ('login') {
+                <label>Usuário</label>
+                <input class="cod" [(ngModel)]="loginUser" (keyup.enter)="rodar()" placeholder="usuário"
+                       autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+                <label>Senha</label>
+                <input class="cod" [(ngModel)]="loginSenha" (keyup.enter)="rodar()" placeholder="senha"
+                       autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+                <button class="block" (click)="rodar()" [disabled]="carregando()">Entrar</button>
+              }
+              @case ('busca') {
+                <label>Nome</label>
+                <input class="cod" [(ngModel)]="buscaNome" (keyup.enter)="rodar()" placeholder="nome do funcionário"
+                       autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+                <button class="block" (click)="rodar()" [disabled]="carregando()">Buscar</button>
+              }
+              @case ('stats') {
+                <label>Agregação</label>
+                <select [(ngModel)]="statsAgg">
+                  <option>COUNT(*)</option><option>AVG(renda)</option><option>SUM(renda)</option>
+                  <option>MIN(renda)</option><option>MAX(renda)</option>
+                </select>
+                <label>Condição (WHERE)</label>
+                <input class="cod" [(ngModel)]="statsOnde" (keyup.enter)="rodar()" placeholder="ex.: cidade='Curitiba'"
+                       autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+                <button class="block" (click)="rodar()" [disabled]="carregando()">Consultar</button>
+              }
+              @case ('relatorio') {
+                <label>Ordenar por</label>
+                <input class="cod" [(ngModel)]="relOrdem" (keyup.enter)="rodar()" placeholder="nome"
+                       autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+                <button class="block" (click)="rodar()" [disabled]="carregando()">Gerar relatório</button>
+              }
+            }
+          </div>
+
+          @if (resultado(); as r) {
+            <div class="saida">
+              @if (r.sql) {
+                <div class="sql"><span class="rot">SQL executado</span><code>{{ r.sql }}</code></div>
+              }
+              @if (r.erro) {
+                <div class="erro"><i class="fa-solid fa-triangle-exclamation"></i> {{ r.erro }}</div>
+              } @else if (r.linhas.length) {
+                <div class="tabela">
+                  <table>
+                    <thead><tr>@for (col of r.colunas; track col) { <th>{{ col }}</th> }</tr></thead>
+                    <tbody>
+                      @for (lin of r.linhas; track $index) {
+                        <tr>@for (col of r.colunas; track col) { <td>{{ lin[col] }}</td> }</tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              } @else {
+                <div class="vazio">0 linhas.</div>
+              }
+              @if (r.resolvido) {
+                <div class="ganho"><i class="fa-solid fa-circle-check"></i> Falha reproduzida! Mais {{ r.resolvido.pontos }} pontos</div>
+              }
+            </div>
+          }
+        }
+      }
+    }
+
+    <!-- resposta (cenários de dedução), sempre acessível -->
+    @if (c.tipo === 'resposta' && !resolvido(c)) {
+      <div class="card resp">
+        <label>Sua resposta</label>
+        <div class="resp-linha">
+          <input class="cod" [(ngModel)]="resposta" (keyup.enter)="responder()" placeholder="valor encontrado"
+                 autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+          <button (click)="responder()">Enviar</button>
+        </div>
+        @if (respostaMsg() === 'certo') { <div class="rmsg ok">Correto!</div> }
+        @if (respostaMsg() === 'errado') { <div class="rmsg no">Não é isso. Tente de novo.</div> }
+      </div>
+    }
+
+    <div class="rodape-det">
+      @if (!resolvido(c)) {
+        @if (dicas()[c.id]) {
+          <div class="dica"><i class="fa-solid fa-lightbulb"></i> {{ dicas()[c.id] }}</div>
+        } @else {
+          <button class="sec dica-btn" (click)="pedirDica()"><i class="fa-solid fa-lightbulb"></i> Pedir dica (menos {{ custoDica(c.base) }} pontos)</button>
+        }
+      }
+      <button class="sec reset" (click)="resetarAmbiente()">Resetar ambiente</button>
+    </div>
+  </main>
+}
+
+<!-- ===================== LISTA / PLACAR ===================== -->
+@if (!aberto()) {
+  <main class="conteudo">
+    @if (aba() === 'cenarios') {
+      <div class="lista-cab">
+        <h2>Cenários</h2>
+        <span class="cont">{{ encontradas() }}/{{ config()?.total }}</span>
+      </div>
+      <div class="lista">
+        @for (c of config()?.cenarios; track c.id) {
+          <button class="cenario" [class.ok]="resolvido(c)" [disabled]="!rodando()" (click)="abrir(c)">
+            <div class="c-top">
+              <span class="c-nome">{{ c.nome }}</span>
+              @if (!rodando()) { <i class="fa-solid fa-lock c-lock" title="bloqueado"></i> }
+              @else if (resolvido(c)) { <i class="fa-solid fa-circle-check c-check" title="resolvido"></i> }
+              @else { <span class="tag" [class]="c.dificuldade">{{ c.dificuldade }}</span> }
+            </div>
+            <div class="c-resumo">{{ c.resumo }}</div>
+            <div class="c-pts">{{ c.base }} pts</div>
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="lista-cab"><h2>Placar</h2></div>
+      <ol class="placar">
+        @for (l of placar(); track l.id) {
+          <li [class.eu]="l.id === sockId()">
+            <span class="pos">{{ $index + 1 }}</span>
+            <span class="pn">{{ l.nome }}</span>
+            <span class="psolv">{{ l.solves.length }}/{{ config()?.total }}</span>
+            <span class="pp">{{ l.pontos }}</span>
+          </li>
+        } @empty {
+          <li class="vazio">ninguém ainda</li>
+        }
+      </ol>
+    }
+  </main>
+
+  <nav class="tabs">
+    <button [class.on]="aba()==='cenarios'" (click)="aba.set('cenarios')">Cenários</button>
+    <button [class.on]="aba()==='placar'" (click)="aba.set('placar')">Placar</button>
+  </nav>
+}
+
+<!-- ranking final -->
+@if (terminou()) {
+  <div class="final">
+    <div class="card fcard">
+      <h2><i class="fa-solid fa-trophy"></i> Ranking final</h2>
+      <ol>
+        @for (l of placar(); track l.id) {
+          <li [class.eu]="l.id === sockId()">
+            <span class="pos">{{ $index + 1 }}</span>
+            <span class="pn">{{ l.nome }}</span>
+            <span class="pp">{{ l.pontos }}</span>
+          </li>
+        }
+      </ol>
+    </div>
+  </div>
+}
+
+<!-- toasts -->
+<div class="toasts">
+  @for (t of toasts(); track $index) {
+    <div class="toast"><i class="fa-solid fa-circle-check"></i> {{ t.texto }} <b>+{{ t.pontos }}</b></div>
+  }
+</div>
